@@ -188,7 +188,7 @@ export default function AdminDashboard({ user }: { user: User }) {
                   className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2 focus:ring-1 focus:ring-zinc-600 outline-none"
                 />
               </div>
-              <div className="flex items-center gap-3 mt-2 sm:mt-0">
+              <div className="flex items-center gap-3 mt-2 sm:mt-0 flex-wrap">
                 <label className="inline-flex items-center gap-2 text-sm text-zinc-300">
                   <input
                     type="checkbox"
@@ -198,6 +198,16 @@ export default function AdminDashboard({ user }: { user: User }) {
                   />
                   <span>Verified badge</span>
                 </label>
+                {current.verified && (
+                  <select
+                    value={current.badgeType || 'standard'}
+                    onChange={e => setEditingProfile({ ...current, badgeType: e.target.value as 'standard' | 'platinum' })}
+                    className="bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-1 text-sm text-zinc-300 focus:ring-1 focus:ring-zinc-600 outline-none"
+                  >
+                    <option value="standard">Standard</option>
+                    <option value="platinum">Platinum</option>
+                  </select>
+                )}
               </div>
             </div>
 
@@ -316,8 +326,10 @@ export default function AdminDashboard({ user }: { user: User }) {
                             <td className="p-4 font-medium text-white flex items-center gap-2">
                               {p.name}
                               {p.verified && (
-                                <div className="w-4 h-4 rounded-full bg-[#1877F2] flex items-center justify-center flex-shrink-0" title="Verified">
-                                  <CheckCircle2 className="w-[10px] h-[10px] text-white stroke-[3]" />
+                                <div className={`w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0 ${p.badgeType === 'platinum' ? 'bg-gradient-to-br from-[#FFD700] via-[#D4AF37] to-[#B8860B] shadow-[0_0_8px_rgba(212,175,55,0.4)] border border-[#FFD700]/30' : 'bg-white'}`} title={p.badgeType === 'platinum' ? 'Platinum Verified' : 'Verified'}>
+                                  <svg className={`w-3 h-3 ${p.badgeType === 'platinum' ? 'text-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.3)]' : 'text-black'}`} fill="currentColor" viewBox="0 0 20 20">
+                                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                  </svg>
                                 </div>
                               )}
                             </td>
@@ -379,8 +391,10 @@ export default function AdminDashboard({ user }: { user: User }) {
                         <div className="flex items-center gap-2 mb-1">
                           <h3 className="font-medium text-lg leading-tight">{p.name}</h3>
                           {p.verified && (
-                            <div className="w-4 h-4 rounded-full bg-[#1877F2] flex items-center justify-center flex-shrink-0" title="Verified">
-                              <CheckCircle2 className="w-[10px] h-[10px] text-white stroke-[3]" />
+                            <div className={`w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0 ${p.badgeType === 'platinum' ? 'bg-gradient-to-br from-[#FFD700] via-[#D4AF37] to-[#B8860B] shadow-[0_0_8px_rgba(212,175,55,0.4)] border border-[#FFD700]/30' : 'bg-white'}`} title={p.badgeType === 'platinum' ? 'Platinum Verified' : 'Verified'}>
+                              <svg className={`w-3 h-3 ${p.badgeType === 'platinum' ? 'text-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.3)]' : 'text-black'}`} fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                              </svg>
                             </div>
                           )}
                         </div>

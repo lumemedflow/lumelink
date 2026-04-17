@@ -188,16 +188,22 @@ END:VCARD`;
                 {profile.name.charAt(0)}
               </div>
             )}
-            <div className="flex items-center justify-center gap-3 mb-1">
+            <div className="flex items-center justify-center gap-2 mb-1">
               <h1 className="text-[22px] font-semibold">{profile.name}</h1>
               {profile.verified && (
                 <div 
-                  className="w-5 h-5 rounded-full bg-[#1877F2] flex items-center justify-center flex-shrink-0 transition-transform hover:scale-110 cursor-help group relative"
-                  title="Verified"
+                  className={`w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0 cursor-help group relative ${
+                    profile.badgeType === 'platinum'
+                      ? 'bg-gradient-to-br from-[#FFD700] via-[#D4AF37] to-[#B8860B] shadow-[0_0_8px_rgba(212,175,55,0.4)] border border-[#FFD700]/30'
+                      : 'bg-white'
+                  }`}
+                  title={profile.badgeType === 'platinum' ? 'Platinum Verified' : 'Verified'}
                 >
-                  <CheckCircle2 className="w-[14px] h-[14px] text-white stroke-[3]" />
+                  <svg className={`w-3 h-3 ${profile.badgeType === 'platinum' ? 'text-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.3)]' : 'text-black'}`} fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  </svg>
                   <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-zinc-900 text-white text-[10px] rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-lg border border-zinc-700">
-                    Verified
+                    {profile.badgeType === 'platinum' ? 'Platinum Verified' : 'Verified'}
                   </span>
                 </div>
               )}
