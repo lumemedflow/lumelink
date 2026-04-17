@@ -247,7 +247,20 @@ END:VCARD`;
                  {profile.gallery.map((img, idx) => {
                    const parsedImg = getDirectImageUrl(img);
                    if (!parsedImg) return null;
-                   return <img key={idx} src={parsedImg} referrerPolicy="no-referrer" alt="" className="w-56 h-56 snap-center shrink-0 object-cover rounded-2xl bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.1)] shadow-[0_8px_32px_rgba(0,0,0,0.3)]" />;
+                   return (
+                     <img
+                       key={idx}
+                       src={parsedImg}
+                       referrerPolicy="no-referrer"
+                       loading="lazy"
+                       alt={profile.name + ' gallery image'}
+                       onError={(e) => {
+                         e.currentTarget.src = '/lumelink.png';
+                         e.currentTarget.style.objectFit = 'contain';
+                       }}
+                       className="w-56 h-56 snap-center shrink-0 object-cover rounded-2xl bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.1)] shadow-[0_8px_32px_rgba(0,0,0,0.3)]"
+                     />
+                   );
                  })}
                </div>
              </div>

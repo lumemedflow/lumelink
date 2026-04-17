@@ -143,7 +143,7 @@ export default function AdminDashboard({ user }: { user: User }) {
                 className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2 focus:ring-1 focus:ring-zinc-600 outline-none"
                 placeholder="https://image1.jpg&#10;https://image2.jpg"
               />
-              <p className="text-xs text-zinc-500 mt-1">Paste direct Google Drive links or image URLs, one per line.</p>
+              <p className="text-xs text-zinc-500 mt-1">Paste direct image URLs or Google Drive share links (public access required), one per line.</p>
             </div>
 
             <div>
