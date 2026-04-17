@@ -72,7 +72,8 @@ export default function Landing({ user }: { user: User | null }) {
       await signInWithPopup(auth, provider);
       navigate('/admin');
     } catch (err) {
-      console.error(err);
+      console.error('Super Admin login failed:', err);
+      alert('Sign-in failed. Please allow popups and try again, or check your browser security settings.');
     }
   };
 
@@ -102,9 +103,9 @@ export default function Landing({ user }: { user: User | null }) {
            <img src="/lumelink.png" alt="LumeLink" className="h-8 sm:h-12 w-auto object-contain" onError={e => e.currentTarget.style.display='none'} />
            <div className="flex items-center gap-4">
              {user ? (
-               <button onClick={() => navigate('/admin')} className="text-sm font-medium text-white/90 hover:text-white transition-colors bg-white/10 hover:bg-white/20 border border-white/20 px-5 py-2 rounded-full">Dashboard</button>
+               <button type="button" onClick={() => navigate('/admin')} className="text-sm font-medium text-white/90 hover:text-white transition-colors bg-white/10 hover:bg-white/20 border border-white/20 px-5 py-2 rounded-full">Dashboard</button>
              ) : (
-               <button onClick={handleLogin} className="text-sm font-medium text-white/90 hover:text-white transition-colors bg-white/10 hover:bg-white/20 border border-white/20 px-5 py-2 rounded-full hidden sm:block">Super Admin</button>
+               <button type="button" onClick={handleLogin} className="text-sm font-medium text-white/90 hover:text-white transition-colors bg-white/10 hover:bg-white/20 border border-white/20 px-5 py-2 rounded-full">Super Admin</button>
              )}
              <a href="https://wa.me/9154276077" target="_blank" rel="noreferrer" className="text-sm font-semibold bg-white text-black hover:bg-gray-200 px-5 py-2 rounded-full transition-colors shadow-[0_0_20px_rgba(255,255,255,0.2)]">Get LumeLink</a>
            </div>
@@ -167,6 +168,7 @@ export default function Landing({ user }: { user: User | null }) {
                 </button>
               ) : (
                 <button 
+                  type="button"
                   onClick={handleLogin}
                   className="w-full sm:w-auto px-6 py-4 bg-[rgba(255,255,255,0.04)] hover:bg-[rgba(255,255,255,0.08)] border border-[rgba(255,255,255,0.1)] rounded-[12px] font-medium transition-all flex items-center justify-center gap-2 text-[14px]"
                 >
