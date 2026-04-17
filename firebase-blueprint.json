@@ -1,0 +1,33 @@
+{
+  "entities": {
+    "BusinessProfile": {
+      "title": "BusinessProfile",
+      "description": "A digital business profile managed by the super admin.",
+      "type": "object",
+      "properties": {
+        "slug": { "type": "string" },
+        "name": { "type": "string" },
+        "tagline": { "type": "string" },
+        "about": { "type": "string" },
+        "logoUrl": { "type": "string" },
+        "contact": { "type": "object" },
+        "social": { "type": "object" },
+        "services": { "type": "array" },
+        "gallery": { "type": "array" },
+        "testimonials": { "type": "array" },
+        "offers": { "type": "array" },
+        "createdAt": { "type": "number" },
+        "updatedAt": { "type": "number" },
+        "scanCount": { "type": "number" },
+        "clickCounts": { "type": "object" }
+      },
+      "required": ["slug", "name"]
+    }
+  },
+  "firestore": {
+    "/profiles/{profileId}": {
+      "schema": { "$ref": "#/entities/BusinessProfile" },
+      "description": "Collection of business profiles."
+    }
+  }
+}
