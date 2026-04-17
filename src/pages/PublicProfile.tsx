@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { collection, query, where, getDocs, onSnapshot } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { BusinessProfile } from '../types';
@@ -65,6 +65,28 @@ export default function PublicProfile() {
       </div>
     );
   }
+
+  useEffect(() => {
+    if (!profile) return;
+
+    const setMetaTag = (selector: string, attr: 'name' | 'property', value: string, content: string) => {
+      let el = document.querySelector(`meta[${attr}="${value}"]`) as HTMLMetaElement | null;
+      if (!el) {
+        el = document.createElement('meta');
+        el.setAttribute(attr, value);
+        document.head.appendChild(el);
+      }
+      el.content = content;
+    };
+
+    const description = profile.tagline || profile.about || 'Premium digital business profile by LumeLink.';
+    document.title = `${profile.name} | LumeLink`;
+    setMetaTag('meta', 'name', 'description', description);
+    setMetaTag('meta', 'property', 'og:title', `${profile.name} | LumeLink`);
+    setMetaTag('meta', 'property', 'og:description', description);
+    setMetaTag('meta', 'property', 'og:url', window.location.href);
+    setMetaTag('meta', 'property', 'og:image', getDirectImageUrl(profile.logoUrl || profile.gallery?.[0]) || `${window.location.origin}/favicon.svg`);
+  }, [profile]);
 
   const handleShare = async () => {
     try {

@@ -139,7 +139,7 @@ export default function AdminDashboard({ user }: { user: User }) {
               <textarea 
                 rows={3}
                 value={(current.gallery || []).join('\n')} 
-                onChange={e => setEditingProfile({ ...current, gallery: e.target.value.split('\n').map(url => url.trim()).filter(Boolean) })} 
+                onChange={e => setEditingProfile({ ...current, gallery: e.target.value.split(/\r?\n/).map(url => url.trim()).filter(Boolean) })} 
                 className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2 focus:ring-1 focus:ring-zinc-600 outline-none"
                 placeholder="https://image1.jpg&#10;https://image2.jpg"
               />
