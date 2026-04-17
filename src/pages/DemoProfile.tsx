@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Share, Mail, Phone, ExternalLink, Navigation, MessageCircle, Map as MapIcon, Globe, Instagram, Facebook, Youtube, Linkedin, Tag, Compass } from 'lucide-react';
-import { cn, getDirectImageUrl } from '../lib/utils';
+import { cn, getDirectImageUrl, getAlternateImageUrl } from '../lib/utils';
 
 const GoogleIcon = () => (
   <svg viewBox="0 0 24 24" width="16" height="16" xmlns="http://www.w3.org/2000/svg">
@@ -116,7 +116,21 @@ export default function DemoProfile() {
           <div className="px-6 pt-12 pb-6 text-center">
             {profile.logoUrl && (
                <div className="w-16 h-16 mx-auto bg-gradient-to-br from-[#eee] to-[#666] border border-[rgba(255,255,255,0.1)] rounded-[20px] mb-4 overflow-hidden">
-                 <img src={getDirectImageUrl(profile.logoUrl)} alt={profile.name} referrerPolicy="no-referrer" className="w-full h-full object-cover" />
+                 <img
+                   src={getDirectImageUrl(profile.logoUrl)}
+                   alt={profile.name}
+                   referrerPolicy="no-referrer"
+                   onError={(e) => {
+                     const altUrl = getAlternateImageUrl(getDirectImageUrl(profile.logoUrl) || profile.logoUrl || '');
+                     if (altUrl && altUrl !== e.currentTarget.src) {
+                       e.currentTarget.src = altUrl;
+                       return;
+                     }
+                     e.currentTarget.src = '/lumelink.png';
+                     e.currentTarget.style.objectFit = 'contain';
+                   }}
+                   className="w-full h-full object-cover"
+                 />
                </div>
             )}
             <h1 className="text-[22px] font-semibold mb-1">{profile.name}</h1>
@@ -185,7 +199,25 @@ export default function DemoProfile() {
               {profile.gallery.map((img, idx) => {
                  const parsedImg = getDirectImageUrl(img);
                  if (!parsedImg) return null;
-                 return <img key={idx} src={parsedImg} referrerPolicy="no-referrer" alt="" className="w-56 h-56 snap-center shrink-0 object-cover rounded-2xl bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.1)] shadow-[0_8px_32px_rgba(0,0,0,0.3)]" />;
+                 return (
+                   <img
+                     key={idx}
+                     src={parsedImg}
+                     referrerPolicy="no-referrer"
+                     loading="lazy"
+                     alt={`${profile.name} gallery image`}
+                     onError={(e) => {
+                       const altUrl = getAlternateImageUrl(parsedImg);
+                       if (altUrl !== parsedImg) {
+                         e.currentTarget.src = altUrl;
+                         return;
+                       }
+                       e.currentTarget.src = '/lumelink.png';
+                       e.currentTarget.style.objectFit = 'contain';
+                     }}
+                     className="w-56 h-56 snap-center shrink-0 object-cover rounded-2xl bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.1)] shadow-[0_8px_32px_rgba(0,0,0,0.3)]"
+                   />
+                 );
               })}
             </div>
           </div>

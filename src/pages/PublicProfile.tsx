@@ -5,7 +5,7 @@ import { db } from '../lib/firebase';
 import { BusinessProfile } from '../types';
 import { Share, MapPin, Mail, Phone, ExternalLink, Download, CheckCircle2, Navigation, MessageCircle, Map as MapIcon, Globe, Instagram, Facebook, Youtube, Linkedin, MoveRight, Tag, Compass } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { cn, getDirectImageUrl } from '../lib/utils';
+import { cn, getDirectImageUrl, getAlternateImageUrl } from '../lib/utils';
 
 const GoogleIcon = () => (
   <svg viewBox="0 0 24 24" width="16" height="16" xmlns="http://www.w3.org/2000/svg">
@@ -157,7 +157,21 @@ END:VCARD`;
           <div className="px-6 pt-12 pb-6 text-center">
             {profile.logoUrl ? (
                <div className="w-16 h-16 mx-auto bg-gradient-to-br from-[#eee] to-[#666] border border-[rgba(255,255,255,0.1)] rounded-[20px] mb-4 overflow-hidden">
-                 <img src={getDirectImageUrl(profile.logoUrl)} alt={profile.name} referrerPolicy="no-referrer" className="w-full h-full object-cover" />
+                 <img
+                   src={getDirectImageUrl(profile.logoUrl)}
+                   alt={profile.name}
+                   referrerPolicy="no-referrer"
+                   onError={(e) => {
+                     const altUrl = getAlternateImageUrl(getDirectImageUrl(profile.logoUrl) || profile.logoUrl || '');
+                     if (altUrl && altUrl !== e.currentTarget.src) {
+                       e.currentTarget.src = altUrl;
+                       return;
+                     }
+                     e.currentTarget.src = '/lumelink.png';
+                     e.currentTarget.style.objectFit = 'contain';
+                   }}
+                   className="w-full h-full object-cover"
+                 />
                </div>
             ) : (
               <div className="w-16 h-16 mx-auto bg-[rgba(255,255,255,0.04)] text-white border border-[rgba(255,255,255,0.1)] rounded-[20px] mb-4 flex items-center justify-center text-xl font-bold">
@@ -255,6 +269,11 @@ END:VCARD`;
                        loading="lazy"
                        alt={profile.name + ' gallery image'}
                        onError={(e) => {
+                         const altUrl = getAlternateImageUrl(parsedImg);
+                         if (altUrl !== parsedImg) {
+                           e.currentTarget.src = altUrl;
+                           return;
+                         }
                          e.currentTarget.src = '/lumelink.png';
                          e.currentTarget.style.objectFit = 'contain';
                        }}
