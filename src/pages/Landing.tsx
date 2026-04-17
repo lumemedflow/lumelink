@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+import { signInWithPopup, signInWithRedirect, GoogleAuthProvider } from 'firebase/auth';
 import { auth } from '../lib/firebase';
 import { useNavigate } from 'react-router-dom';
 import { User } from 'firebase/auth';
@@ -67,13 +67,38 @@ export default function Landing({ user }: { user: User | null }) {
   };
 
   const handleLogin = async () => {
+    const provider = new GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: 'select_account' });
+
     try {
-      const provider = new GoogleAuthProvider();
       await signInWithPopup(auth, provider);
       navigate('/admin');
+      return;
     } catch (err) {
-      console.error('Super Admin login failed:', err);
-      alert('Sign-in failed. Please allow popups and try again, or check your browser security settings.');
+      const error = err as { code?: string; message?: string };
+      console.error('Super Admin login failed:', error);
+
+      if (
+        error.code === 'auth/popup-blocked' ||
+        error.code === 'auth/popup-closed-by-user' ||
+        error.code === 'auth/cancelled-popup-request' ||
+        error.code === 'auth/operation-not-supported-in-this-environment'
+      ) {
+        try {
+          await signInWithRedirect(auth, provider);
+          return;
+        } catch (redirectErr) {
+          console.error('Redirect auth failed:', redirectErr);
+        }
+      }
+
+      let message = 'Sign-in failed. Please allow popups and try again, or check your browser security settings.';
+      if (error.code === 'auth/unauthorized-domain') {
+        message = 'Firebase Auth refused this domain. Add your Netlify domain to the Firebase project authorized domains.';
+      } else if (error.code) {
+        message = `Sign-in failed (${error.code}). ${error.message ?? 'Please check your Firebase auth settings.'}`;
+      }
+      alert(message);
     }
   };
 
