@@ -6,6 +6,7 @@ import { BusinessProfile } from '../types';
 import { QRCodeSVG } from 'qrcode.react';
 import { Plus, Edit2, Trash2, LogOut, Link as LinkIcon, QrCode, BarChart, MessageCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { getDirectImageUrl } from '../lib/utils';
 
 export default function AdminDashboard({ user }: { user: User }) {
   const [profiles, setProfiles] = useState<BusinessProfile[]>([]);
@@ -67,7 +68,9 @@ export default function AdminDashboard({ user }: { user: User }) {
     const handleSave = async (e: React.FormEvent) => {
       e.preventDefault();
       try {
-        const toSave = { ...current, updatedAt: Date.now() };
+        const normalizedGallery = (current.gallery || []).map(url => getDirectImageUrl(url) || url).filter(Boolean);
+        const normalizedLogoUrl = getDirectImageUrl(current.logoUrl) || current.logoUrl || '';
+        const toSave = { ...current, gallery: normalizedGallery, logoUrl: normalizedLogoUrl, updatedAt: Date.now() };
         if (isCreating) {
           await addDoc(collection(db, 'profiles'), toSave);
         } else if (editingProfile?.id) {
@@ -135,15 +138,43 @@ export default function AdminDashboard({ user }: { user: User }) {
             </div>
 
             <div>
-              <label className="block text-sm text-zinc-400 mb-1">Gallery Image URLs (One link per line)</label>
-              <textarea 
-                rows={3}
-                value={(current.gallery || []).join('\n')} 
-                onChange={e => setEditingProfile({ ...current, gallery: e.target.value.split(/\r?\n/).map(url => url.trim()).filter(Boolean) })} 
-                className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2 focus:ring-1 focus:ring-zinc-600 outline-none"
-                placeholder="https://image1.jpg&#10;https://image2.jpg"
-              />
-              <p className="text-xs text-zinc-500 mt-1">Paste direct image URLs or Google Drive share links (public access required), one per line.</p>
+              <label className="block text-sm text-zinc-400 mb-1">Gallery Image URLs</label>
+              {(current.gallery || []).map((img, idx) => (
+                <div key={`gallery-${idx}`} className="flex items-center gap-2 mb-2">
+                  <input
+                    type="url"
+                    value={img}
+                    onChange={e => {
+                      const updatedGallery = [...(current.gallery || [])];
+                      updatedGallery[idx] = e.target.value;
+                      setEditingProfile({ ...current, gallery: updatedGallery });
+                    }}
+                    className="flex-1 bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2 focus:ring-1 focus:ring-zinc-600 outline-none"
+                    placeholder="https://drive.google.com/file/d/FILE_ID/view?usp=sharing"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const updatedGallery = [...(current.gallery || [])];
+                      updatedGallery.splice(idx, 1);
+                      setEditingProfile({ ...current, gallery: updatedGallery });
+                    }}
+                    className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-zinc-800 text-zinc-300 hover:bg-zinc-700 transition"
+                    aria-label="Remove gallery image"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              ))}
+              <button
+                type="button"
+                onClick={() => setEditingProfile({ ...current, gallery: [...(current.gallery || []), ''] })}
+                className="inline-flex items-center gap-2 text-sm font-semibold text-white bg-white/10 hover:bg-white/15 border border-white/10 px-4 py-2 rounded-full transition"
+              >
+                <Plus className="w-4 h-4" />
+                Add Gallery Image
+              </button>
+              <p className="text-xs text-zinc-500 mt-2">Use public image URLs or Google Drive share links. Add one image link at a time and tap + to add another.</p>
             </div>
 
             <div>
