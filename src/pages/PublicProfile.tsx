@@ -26,6 +26,7 @@ export default function PublicProfile() {
   const [loading, setLoading] = useState(true);
   const [isSocialExpanded, setIsSocialExpanded] = useState(false);
   const [isFormExpanded, setIsFormExpanded] = useState(false);
+  const [timeString, setTimeString] = useState(() => new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
 
   useEffect(() => {
     if (!slug) return;
@@ -47,6 +48,15 @@ export default function PublicProfile() {
 
     return () => unsubscribe();
   }, [slug]);
+
+  useEffect(() => {
+    const updateClock = () => {
+      setTimeString(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+    };
+    updateClock();
+    const interval = window.setInterval(updateClock, 1000);
+    return () => window.clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     if (!profile) return;
@@ -148,7 +158,7 @@ END:VCARD`;
           <div className="hidden sm:block w-[120px] h-[24px] bg-[#000] absolute top-0 left-1/2 -translate-x-1/2 rounded-b-[16px] z-50"></div>
           
           <div className="hidden sm:flex justify-between px-[30px] pt-[14px] text-[12px] font-semibold text-[#FFFFFF] opacity-80 shrink-0 sticky top-0 z-40 bg-[#0a0a0a]">
-             <span>9:41</span>
+             <span>{timeString}</span>
              <div className="flex gap-[6px] items-center">
                 <div className="w-2.5 h-2.5 bg-white/80 rounded-full" />
              </div>
@@ -181,7 +191,7 @@ END:VCARD`;
             <div className="flex items-center justify-center gap-2 mb-1">
               <h1 className="text-[22px] font-semibold">{profile.name}</h1>
               {profile.verified && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-sky-500/15 px-2 py-1 text-[11px] uppercase tracking-[0.18em] text-sky-200">
+                <span className="inline-flex items-center gap-1 rounded-full bg-[#1877F2] px-2.5 py-1 text-[11px] uppercase tracking-[0.14em] text-white shadow-[0_0_0_1px_rgba(255,255,255,0.08)]">
                   <CheckCircle2 className="w-3.5 h-3.5" /> Verified
                 </span>
               )}
