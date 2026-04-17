@@ -33,6 +33,11 @@ export function getGoogleDriveDownloadUrl(url: string): string | undefined {
   return fileId ? `https://drive.google.com/uc?export=download&id=${fileId}` : undefined;
 }
 
+export function getGoogleDrivePreviewUrl(url: string): string | undefined {
+  const fileId = getGoogleDriveFileId(url);
+  return fileId ? `https://drive.google.com/thumbnail?authuser=0&sz=w1280&id=${fileId}` : undefined;
+}
+
 export function getDirectImageUrl(url: string | undefined): string | undefined {
   if (!url) return undefined;
 
@@ -49,9 +54,11 @@ export function getDirectImageUrl(url: string | undefined): string | undefined {
 }
 
 export function getAlternateImageUrl(url: string): string {
-  const fileId = getGoogleDriveFileId(url);
-  if (fileId) {
-    return `https://drive.google.com/uc?export=download&id=${fileId}`;
-  }
+  const drivePreview = getGoogleDrivePreviewUrl(url);
+  if (drivePreview) return drivePreview;
+
+  const driveDownload = getGoogleDriveDownloadUrl(url);
+  if (driveDownload) return driveDownload;
+
   return url;
 }
