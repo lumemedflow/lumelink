@@ -315,7 +315,11 @@ export default function AdminDashboard({ user }: { user: User }) {
                           <tr key={p.id} className="hover:bg-zinc-800/30 transition-colors">
                             <td className="p-4 font-medium text-white flex items-center gap-2">
                               {p.name}
-                              {p.verified && <span className="inline-flex items-center gap-1 rounded-full bg-sky-500/15 px-2 py-1 text-xs text-sky-300"><CheckCircle2 className="w-3.5 h-3.5" /> Verified</span>}
+                              {p.verified && (
+                                <div className="w-4 h-4 rounded-full bg-[#1877F2] flex items-center justify-center flex-shrink-0" title="Verified">
+                                  <CheckCircle2 className="w-[10px] h-[10px] text-white stroke-[3]" />
+                                </div>
+                              )}
                             </td>
                             <td className="p-4 text-zinc-400 font-mono text-sm">/{p.slug}</td>
                             <td className="p-4 text-right text-white font-medium">{p.scanCount || 0}</td>
@@ -370,10 +374,18 @@ export default function AdminDashboard({ user }: { user: User }) {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {profiles.map(p => (
                   <div key={p.id} className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 relative group overflow-hidden flex flex-col">
-                    <div className="flex justify-between items-start mb-6 align-top">
+                    <div className="flex justify-between items-start mb-6 align-top gap-4">
                       <div>
-                        <h3 className="font-medium text-lg leading-tight mb-1">{p.name}</h3>
+                        <div className="flex items-center gap-2 mb-1">
+                          <h3 className="font-medium text-lg leading-tight">{p.name}</h3>
+                          {p.verified && (
+                            <div className="w-4 h-4 rounded-full bg-[#1877F2] flex items-center justify-center flex-shrink-0" title="Verified">
+                              <CheckCircle2 className="w-[10px] h-[10px] text-white stroke-[3]" />
+                            </div>
+                          )}
+                        </div>
                         <p className="text-xs text-zinc-500 font-mono">/{p.slug}</p>
+                        <p className="text-xs text-zinc-500 mt-3">Updated {formatTimeAgo(p.updatedAt || 0)}</p>
                       </div>
                       <div className="bg-white p-1 rounded min-w-[64px] min-h-[64px] shrink-0 border border-zinc-800">
                          <QRCodeSVG value={`${window.location.origin}/p/${p.slug}`} size={56} bgColor="#ffffff" fgColor="#000000" />

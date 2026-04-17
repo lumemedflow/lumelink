@@ -188,12 +188,18 @@ END:VCARD`;
                 {profile.name.charAt(0)}
               </div>
             )}
-            <div className="flex items-center justify-center gap-2 mb-1">
+            <div className="flex items-center justify-center gap-3 mb-1">
               <h1 className="text-[22px] font-semibold">{profile.name}</h1>
               {profile.verified && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-[#1877F2] px-2.5 py-1 text-[11px] uppercase tracking-[0.14em] text-white shadow-[0_0_0_1px_rgba(255,255,255,0.08)]">
-                  <CheckCircle2 className="w-3.5 h-3.5" /> Verified
-                </span>
+                <div 
+                  className="w-5 h-5 rounded-full bg-[#1877F2] flex items-center justify-center flex-shrink-0 transition-transform hover:scale-110 cursor-help group relative"
+                  title="Verified"
+                >
+                  <CheckCircle2 className="w-[14px] h-[14px] text-white stroke-[3]" />
+                  <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-zinc-900 text-white text-[10px] rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-lg border border-zinc-700">
+                    Verified
+                  </span>
+                </div>
               )}
             </div>
             {profile.tagline && (
