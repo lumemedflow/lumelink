@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { collection, query, where, getDocs, onSnapshot } from 'firebase/firestore';
+import { useParams } from 'react-router-dom';
+import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { BusinessProfile } from '../types';
 import { Share, MapPin, Mail, Phone, ExternalLink, Download, CheckCircle2, Navigation, MessageCircle, Map as MapIcon, Globe, Instagram, Facebook, Youtube, Linkedin, MoveRight, Tag, Compass } from 'lucide-react';
@@ -22,7 +22,6 @@ const JustDialIcon = () => (
 
 export default function PublicProfile() {
   const { slug } = useParams<{ slug: string }>();
-  const navigate = useNavigate();
   const [profile, setProfile] = useState<BusinessProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [isSocialExpanded, setIsSocialExpanded] = useState(false);
@@ -49,23 +48,6 @@ export default function PublicProfile() {
     return () => unsubscribe();
   }, [slug]);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-[#050505] flex items-center justify-center">
-        <div className="w-8 h-8 rounded-full border-2 border-white/20 border-t-white animate-spin" />
-      </div>
-    );
-  }
-
-  if (!profile) {
-    return (
-      <div className="min-h-screen bg-[#050505] flex flex-col items-center justify-center text-white/50">
-        <MapPin className="w-12 h-12 mb-4 opacity-20" />
-        <p>Profile Not Found</p>
-      </div>
-    );
-  }
-
   useEffect(() => {
     if (!profile) return;
 
@@ -87,6 +69,23 @@ export default function PublicProfile() {
     setMetaTag('meta', 'property', 'og:url', window.location.href);
     setMetaTag('meta', 'property', 'og:image', getDirectImageUrl(profile.logoUrl || profile.gallery?.[0]) || `${window.location.origin}/favicon.svg`);
   }, [profile]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#050505] flex items-center justify-center">
+        <div className="w-8 h-8 rounded-full border-2 border-white/20 border-t-white animate-spin" />
+      </div>
+    );
+  }
+
+  if (!profile) {
+    return (
+      <div className="min-h-screen bg-[#050505] flex flex-col items-center justify-center text-white/50">
+        <MapPin className="w-12 h-12 mb-4 opacity-20" />
+        <p>Profile Not Found</p>
+      </div>
+    );
+  }
 
   const handleShare = async () => {
     try {
