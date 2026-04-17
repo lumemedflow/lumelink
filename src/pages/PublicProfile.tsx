@@ -178,7 +178,14 @@ END:VCARD`;
                 {profile.name.charAt(0)}
               </div>
             )}
-            <h1 className="text-[22px] font-semibold mb-1">{profile.name}</h1>
+            <div className="flex items-center justify-center gap-2 mb-1">
+              <h1 className="text-[22px] font-semibold">{profile.name}</h1>
+              {profile.verified && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-sky-500/15 px-2 py-1 text-[11px] uppercase tracking-[0.18em] text-sky-200">
+                  <CheckCircle2 className="w-3.5 h-3.5" /> Verified
+                </span>
+              )}
+            </div>
             {profile.tagline && (
               <p className="text-[13px] text-[rgba(255,255,255,0.5)]">{profile.tagline}</p>
             )}

@@ -27,6 +27,7 @@ export interface BusinessProfile {
     price: string;
   }>;
   gallery: string[];
+  verified?: boolean;
   testimonials: Array<{
     name: string;
     text: string;

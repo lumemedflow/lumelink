@@ -4,9 +4,9 @@ import { collection, query, getDocs, addDoc, updateDoc, deleteDoc, doc, onSnapsh
 import { db, auth } from '../lib/firebase';
 import { BusinessProfile } from '../types';
 import { QRCodeSVG } from 'qrcode.react';
-import { Plus, Edit2, Trash2, LogOut, Link as LinkIcon, QrCode, BarChart, MessageCircle } from 'lucide-react';
+import { Plus, Edit2, Trash2, LogOut, Link as LinkIcon, QrCode, BarChart, MessageCircle, CheckCircle2, Download } from 'lucide-react';
+import { formatTimeAgo, getDirectImageUrl } from '../lib/utils';
 import { useNavigate } from 'react-router-dom';
-import { getDirectImageUrl } from '../lib/utils';
 
 export default function AdminDashboard({ user }: { user: User }) {
   const [profiles, setProfiles] = useState<BusinessProfile[]>([]);
@@ -46,6 +46,7 @@ export default function AdminDashboard({ user }: { user: User }) {
     social: {},
     services: [],
     gallery: [],
+    verified: false,
     testimonials: [],
     offers: [],
     createdAt: Date.now(),
@@ -177,14 +178,27 @@ export default function AdminDashboard({ user }: { user: User }) {
               <p className="text-xs text-zinc-500 mt-2">Use public image URLs or Google Drive share links. Add one image link at a time and tap + to add another.</p>
             </div>
 
-            <div>
-              <label className="block text-sm text-zinc-400 mb-1">About</label>
-              <textarea 
-                rows={4}
-                value={current.about} 
-                onChange={e => setEditingProfile({ ...current, about: e.target.value })} 
-                className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2 focus:ring-1 focus:ring-zinc-600 outline-none"
-              />
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex-1">
+                <label className="block text-sm text-zinc-400 mb-1">About</label>
+                <textarea 
+                  rows={4}
+                  value={current.about} 
+                  onChange={e => setEditingProfile({ ...current, about: e.target.value })} 
+                  className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2 focus:ring-1 focus:ring-zinc-600 outline-none"
+                />
+              </div>
+              <div className="flex items-center gap-3 mt-2 sm:mt-0">
+                <label className="inline-flex items-center gap-2 text-sm text-zinc-300">
+                  <input
+                    type="checkbox"
+                    checked={current.verified || false}
+                    onChange={e => setEditingProfile({ ...current, verified: e.target.checked })}
+                    className="rounded border-zinc-700 bg-zinc-950 text-sky-400 focus:ring-sky-400"
+                  />
+                  <span>Verified badge</span>
+                </label>
+              </div>
             </div>
 
             <h3 className="text-lg font-medium border-b border-zinc-800 pb-2 mt-8">Contact Info</h3>
@@ -290,7 +304,8 @@ export default function AdminDashboard({ user }: { user: User }) {
                         <th className="font-medium p-4 bg-zinc-950/50">Slug</th>
                         <th className="font-medium p-4 bg-zinc-950/50 text-right">Views / Scans</th>
                         <th className="font-medium p-4 bg-zinc-950/50 text-right">Link Clicks</th>
-                        <th className="font-medium p-4 bg-zinc-950/50 text-center">Share Report</th>
+                        <th className="font-medium p-4 bg-zinc-950/50 text-right">Updated</th>
+                        <th className="font-medium p-4 bg-zinc-950/50 text-center">Share</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-zinc-800/50">
@@ -298,10 +313,14 @@ export default function AdminDashboard({ user }: { user: User }) {
                         const totalClicks = Object.values(p.clickCounts || {}).reduce((a, b) => Number(a) + Number(b), 0);
                         return (
                           <tr key={p.id} className="hover:bg-zinc-800/30 transition-colors">
-                            <td className="p-4 font-medium text-white">{p.name}</td>
+                            <td className="p-4 font-medium text-white flex items-center gap-2">
+                              {p.name}
+                              {p.verified && <span className="inline-flex items-center gap-1 rounded-full bg-sky-500/15 px-2 py-1 text-xs text-sky-300"><CheckCircle2 className="w-3.5 h-3.5" /> Verified</span>}
+                            </td>
                             <td className="p-4 text-zinc-400 font-mono text-sm">/{p.slug}</td>
                             <td className="p-4 text-right text-white font-medium">{p.scanCount || 0}</td>
                             <td className="p-4 text-right text-white font-medium">{totalClicks}</td>
+                            <td className="p-4 text-right text-zinc-400 text-sm">{formatTimeAgo(p.updatedAt || 0)}</td>
                             <td className="p-4 text-center">
                               <a 
                                 href={`https://wa.me/?text=${encodeURIComponent(`Hi! Here are the latest performance metrics for your digital business card (LumeLink):\n\nCompany: ${p.name}\n\n👁 Total Views: ${p.scanCount || 0}\n🖱 Total Link Clicks: ${totalClicks}\n\nCheck it out here: ${window.location.origin}/p/${p.slug}`)}`} 
@@ -318,7 +337,7 @@ export default function AdminDashboard({ user }: { user: User }) {
                       })}
                       {profiles.length === 0 && (
                         <tr>
-                          <td colSpan={5} className="p-8 text-center text-zinc-500">No profiles generated yet.</td>
+                          <td colSpan={6} className="p-8 text-center text-zinc-500">No profiles generated yet.</td>
                         </tr>
                       )}
                     </tbody>
@@ -361,7 +380,7 @@ export default function AdminDashboard({ user }: { user: User }) {
                       </div>
                     </div>
 
-                    <div className="mt-auto pt-4 border-t border-zinc-800 flex items-center justify-between">
+                    <div className="mt-auto pt-4 border-t border-zinc-800 flex flex-wrap items-center justify-between gap-3">
                       <div className="flex gap-2">
                         <button onClick={() => setEditingProfile(p)} className="p-2 text-zinc-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors">
                           <Edit2 className="w-4 h-4" />
@@ -369,6 +388,27 @@ export default function AdminDashboard({ user }: { user: User }) {
                         <a href={`/p/${p.slug}`} target="_blank" rel="noreferrer" className="p-2 text-zinc-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors">
                           <LinkIcon className="w-4 h-4" />
                         </a>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const svg = document.getElementById(`qr-download-${p.slug}`) as SVGSVGElement | null;
+                            if (!svg) return;
+                            const svgData = new XMLSerializer().serializeToString(svg);
+                            const blob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+                            const url = URL.createObjectURL(blob);
+                            const link = document.createElement('a');
+                            link.href = url;
+                            link.download = `${p.slug || 'lumeqr'}-dark.svg`;
+                            document.body.appendChild(link);
+                            link.click();
+                            document.body.removeChild(link);
+                            URL.revokeObjectURL(url);
+                          }}
+                          className="p-2 text-zinc-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+                          title="Download dark theme QR"
+                        >
+                          <Download className="w-4 h-4" />
+                        </button>
                         <a 
                           href={`https://wa.me/?text=${encodeURIComponent(`Hi! Here are the latest performance metrics for your digital business card (LumeLink):\n\n👁 Total Views: ${p.scanCount || 0}\n🖱 Total Clicks: ${Object.values(p.clickCounts || {}).reduce((a,b)=> Number(a) + Number(b), 0)}\n\nCheck it out here: ${window.location.origin}/p/${p.slug}`)}`} 
                           target="_blank" 
@@ -382,6 +422,9 @@ export default function AdminDashboard({ user }: { user: User }) {
                       <button onClick={() => handleDelete(p.id!)} className="p-2 text-zinc-500 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-colors">
                         <Trash2 className="w-4 h-4" />
                       </button>
+                    </div>
+                    <div className="sr-only">
+                      <QRCodeSVG id={`qr-download-${p.slug}`} value={`${window.location.origin}/p/${p.slug}`} size={256} bgColor="#000000" fgColor="#ffffff" />
                     </div>
                   </div>
                 ))}
